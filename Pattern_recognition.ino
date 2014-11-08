@@ -6,7 +6,7 @@ struct pattern {
         int five;
 };
 
-int timer = 0;
+int timer;
 struct pattern pattern1;
 struct pattern pattern2;
 struct pattern pattern3;
@@ -17,19 +17,20 @@ int num_elements;
 int start_time;
 int duration;
 
-int led = 13;
+int DC = 13;
 
 void setup() {
-        struct pattern pattern1 = {1500, 500, 500, NULL, NULL};
-        struct pattern pattern2 = {1000, 1500, 500, 500, 500};
-        struct pattern pattern3 = {1500, 1000, 500, NULL, NULL};
-        struct pattern patterns[] = {pattern1, pattern2, pattern3};
-        num_patterns = 3;
+        timer = 0;
+        struct pattern pattern1 = {500, 500, NULL, NULL, NULL};
+        struct pattern pattern2 = {500, 500, 500, 500, 500};
+        //struct pattern pattern3 = {500, 500, NULL, NULL, NULL};
+        struct pattern patterns[] = {pattern1, pattern2};
+        num_patterns = 2;
         removed = 0;
         num_elements = 0;
         start_time = 0;
         duration = 0;
-        pinMode(led, OUTPUT);
+        pinMode(DC, OUTPUT);
         Serial.begin(9600);
 }
 
@@ -91,13 +92,13 @@ int get_num_elements(int loc) {
 void loop() {
         int sensorValue = analogRead(A0);
         if (timer == 0){
-                if(sensorValue > 0) {
+                if(sensorValue > 1) {
                         start_time = millis();
                         duration = get_max(0);
                         timer++;
                 }
         }
-        if(sensorValue > 0) {
+        if(sensorValue > 1) {
                 int window = (start_time + duration - millis());
                 if (window > 400 && window < 600)
                         window = 500;
@@ -116,16 +117,24 @@ void loop() {
                         timer++;
                 }
         }
-        if (millis() > start_time + duration) {
+        if (millis() > start_time + duration && timer > 0) {
                         for (int i = 0; i < num_patterns; i++) {
                                     if (get_num_elements(i) < timer) {
-                                                digitalWrite(led, 1);
-                                    }
+                                                digitalWrite(DC, 1);
+                                                delay(3000);
+                                                digitalWrite(DC, 0);
+                                                delay(1000);
+                                                break;
+                                     }
                         }
                         setup();
         }
         if (num_patterns == 1 && timer > get_num_elements(0)) {
-                        digitalWrite(led, 1);
+                        digitalWrite(DC, 1);
+                        delay(3000);
+                        digitalWrite(DC, 0);
+                        delay(1000);
+                        setup();
         }
         Serial.println(sensorValue);
         delay(1);
