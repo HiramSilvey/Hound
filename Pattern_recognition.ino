@@ -22,7 +22,7 @@ int led = 13;
 void setup() {
         struct pattern pattern1 = {1500, 500, 500, NULL, NULL};
         struct pattern pattern2 = {1000, 1500, 500, 500, 500};
-        struct pattern pattern3 = {500, NULL, NULL, NULL, NULL};
+        struct pattern pattern3 = {1500, 1000, 500, NULL, NULL};
         struct pattern patterns[] = {pattern1, pattern2, pattern3};
         num_patterns = 3;
         removed = 0;
@@ -90,7 +90,7 @@ int get_num_elements(int loc) {
 
 void loop() {
         int sensorValue = analogRead(A0);
-        while (timer == 0){
+        if (timer == 0){
                 if(sensorValue > 0) {
                         start_time = millis();
                         duration = get_max(0);
